@@ -1,7 +1,5 @@
 # Des potes et des vélos
 
-An interactive map of six cycling trips. Select a trip, stop, or stage to inspect its route and elevation profile. Each full route is available as a GPX download.
-
 ## Development
 
 ```sh
