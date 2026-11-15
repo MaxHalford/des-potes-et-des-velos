@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Max &amp; Clément" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata><name>Red earth to green country</name><desc>From the red shore of Salagou to Limoges.</desc></metadata>
+<gpx version="1.1" creator="des-potes-et-des-velos" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>Red earth to green country</name></metadata>
   <wpt lat="43.344" lon="3.215"><name>Béziers</name></wpt>
   <wpt lat="43.635" lon="3.367"><name>Lac du Salagou</name></wpt>
   <wpt lat="43.731" lon="3.319"><name>Lodève</name></wpt>

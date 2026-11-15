@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Max &amp; Clément" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata><name>Across Switzerland</name><desc>Warmshowers, clear lakes and the high way home.</desc></metadata>
+<gpx version="1.1" creator="des-potes-et-des-velos" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>Across Switzerland</name></metadata>
   <wpt lat="47.5596" lon="7.5886"><name>Basel</name></wpt>
   <wpt lat="47.171" lon="8.108"><name>Sursee</name></wpt>
   <wpt lat="47.0502" lon="8.3093"><name>Lucerne</name></wpt>

@@ -68,6 +68,7 @@ async function createRoute(trip) {
     const routed = await post('/route', {
       locations: [locations[index], locations[index + 1]],
       costing: 'bicycle',
+      costing_options: { bicycle: { use_ferry: 0 } },
       directions_options: { units: 'kilometers' },
     });
     const profile = await post('/height', {
@@ -95,8 +96,8 @@ function toGpx(trip, points) {
     `  <wpt lat="${stop.coordinates[1]}" lon="${stop.coordinates[0]}"><name>${escapeXml(stop.name)}</name></wpt>`
   ).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Max &amp; Clément" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata><name>${escapeXml(trip.name)}</name><desc>${escapeXml(trip.tagline)}</desc></metadata>
+<gpx version="1.1" creator="des-potes-et-des-velos" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>${escapeXml(trip.name)}</name></metadata>
 ${waypoints}
   <trk><name>${escapeXml(trip.name)}</name><trkseg>
 ${trackPoints}
@@ -108,8 +109,11 @@ function escapeXml(value) {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
 
+const requestedTrips = new Set(process.argv.slice(2));
+const selectedTrips = requestedTrips.size ? trips.filter((trip) => requestedTrips.has(trip.id)) : trips;
+
 await mkdir(outDir, { recursive: true });
-for (const trip of trips) {
+for (const trip of selectedTrips) {
   process.stdout.write(`Routing ${trip.name}… `);
   const { points } = await createRoute(trip);
   await writeFile(new URL(`${trip.id}.gpx`, outDir), toGpx(trip, points));
