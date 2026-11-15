@@ -65,25 +65,35 @@ async function createRoute(trip) {
       }
       continue;
     }
-    const routed = await post('/route', {
-      locations: [locations[index], locations[index + 1]],
-      costing: 'bicycle',
-      costing_options: { bicycle: { use_ferry: 0 } },
-      directions_options: { units: 'kilometers' },
-    });
-    const profile = await post('/height', {
-      encoded_polyline: routed.trip.legs[0].shape,
-      shape_format: 'polyline6',
-      range: true,
-      resample_distance: 40,
-      height_precision: 1,
-    });
-    const coordinates = decodePolyline(profile.encoded_polyline);
-    points.push(...coordinates.map(([lon, lat], pointIndex) => ({
-      lon,
-      lat,
-      ele: profile.range_height[pointIndex]?.[1] ?? 0,
-    })).slice(index ? 1 : 0));
+    const routeVia = trip.routeVia?.[trip.stops[index + 1].name] ?? [];
+    const routeLocations = [
+      locations[index],
+      ...routeVia.map(([lon, lat]) => ({ lon, lat, type: 'break' })),
+      locations[index + 1],
+    ];
+    const useFerry = trip.stops[index].kind === 'ferry' || trip.stops[index + 1].kind === 'ferry';
+
+    for (let routeIndex = 0; routeIndex < routeLocations.length - 1; routeIndex++) {
+      const routed = await post('/route', {
+        locations: [routeLocations[routeIndex], routeLocations[routeIndex + 1]],
+        costing: 'bicycle',
+        costing_options: { bicycle: { use_ferry: useFerry ? 1 : 0 } },
+        directions_options: { units: 'kilometers' },
+      });
+      const profile = await post('/height', {
+        encoded_polyline: routed.trip.legs[0].shape,
+        shape_format: 'polyline6',
+        range: true,
+        resample_distance: 40,
+        height_precision: 1,
+      });
+      const coordinates = decodePolyline(profile.encoded_polyline);
+      points.push(...coordinates.map(([lon, lat], pointIndex) => ({
+        lon,
+        lat,
+        ele: profile.range_height[pointIndex]?.[1] ?? 0,
+      })).slice(points.length ? 1 : 0));
+    }
   }
   return { points };
 }

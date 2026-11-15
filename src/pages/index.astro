@@ -9,6 +9,7 @@ import { pathToFileURL } from 'node:url';
 
 const enrichedTrips = await Promise.all(trips.map(async (trip) => {
   const track = await parseGpx(pathToFileURL(resolve(`public/routes/${trip.id}.gpx`)));
+  const { routeVia: _routeVia, ...publicTrip } = trip;
   const stopIndexes: number[] = [];
 
   trip.stops.forEach((stop) => {
@@ -60,7 +61,7 @@ const enrichedTrips = await Promise.all(trips.map(async (trip) => {
   });
 
   return {
-    ...trip,
+    ...publicTrip,
     stats: {
       distanceKm: Math.round(track.distanceKm),
       ascentM: Math.round(track.ascentM / 10) * 10,
@@ -161,8 +162,10 @@ function smooth(values: number[], width: number) {
         liberty: 'https://tiles.openfreemap.org/styles/liberty',
         positron: 'https://tiles.openfreemap.org/styles/positron',
       };
+      const desktopLayout = window.matchMedia('(min-width: 761px)');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const storedBasemap = localStorage.getItem('basemap');
-      const initialBasemap = storedBasemap in basemapStyles ? storedBasemap : 'liberty';
+      const initialBasemap = Object.hasOwn(basemapStyles, storedBasemap) ? storedBasemap : 'liberty';
       const basemap = maplibreGL({
         style: basemapStyles[initialBasemap],
         attribution: '<a href="https://openfreemap.org">OpenFreeMap</a> © <a href="https://openmaptiles.org">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -312,31 +315,37 @@ function smooth(values: number[], width: number) {
           focusStop(stop);
           requestAnimationFrame(() => requestAnimationFrame(() => {
             list.querySelector(`[data-stop="${stopIndex}"]`)?.scrollIntoView({
-              behavior: wasOpen ? 'smooth' : 'auto',
+              behavior: wasOpen && !reducedMotion.matches ? 'smooth' : 'auto',
               block: 'center',
             });
           }));
         } else {
-          drawerScroll.scrollTo({ top: 0, behavior: wasOpen ? 'smooth' : 'auto' });
+          drawerScroll.scrollTo({ top: 0, behavior: wasOpen && !reducedMotion.matches ? 'smooth' : 'auto' });
           const coordinates = segment?.coordinates ?? trip.track.coordinates;
           fitCoordinates(coordinates);
         }
       }
 
       function focusStop(stop) {
-        const destination = [stop.coordinates[1], stop.coordinates[0]];
-        map.flyTo(destination, Math.max(map.getZoom(), 10), { duration: 0.85 });
-        if (window.innerWidth > 800) {
-          map.once('moveend', () => map.panBy([210, 0], { animate: true, duration: 0.25 }));
-        }
+        const zoom = Math.max(map.getZoom(), 10);
+        const destination = L.latLng(stop.coordinates[1], stop.coordinates[0]);
+        const drawerOffset = desktopLayout.matches ? drawer.getBoundingClientRect().width / 2 : 0;
+        const center = drawerOffset
+          ? map.unproject(map.project(destination, zoom).add([drawerOffset, 0]), zoom)
+          : destination;
+
+        map.stop();
+        if (reducedMotion.matches) map.setView(center, zoom, { animate: false });
+        else map.flyTo(center, zoom, { duration: 0.45 });
       }
 
       function fitCoordinates(coordinates) {
         const bounds = L.latLngBounds(coordinates.map(([lon, lat]) => [lat, lon]));
+        map.stop();
         map.fitBounds(bounds, {
           paddingTopLeft: [90, 90],
-          paddingBottomRight: [window.innerWidth > 800 ? 520 : 90, 100],
-          animate: true,
+          paddingBottomRight: [desktopLayout.matches ? 520 : 90, 100],
+          animate: !reducedMotion.matches,
           duration: 0.85,
         });
       }
@@ -396,7 +405,12 @@ function smooth(values: number[], width: number) {
       function fitAll(animate = true) {
         closeDrawer();
         const points = trips.flatMap((trip) => trip.track.coordinates.map(([lon, lat]) => [lat, lon]));
-        map.fitBounds(L.latLngBounds(points), { padding: [110, 110], animate, duration: 0.85 });
+        map.stop();
+        map.fitBounds(L.latLngBounds(points), {
+          padding: [110, 110],
+          animate: animate && !reducedMotion.matches,
+          duration: 0.85,
+        });
       }
 
       document.querySelectorAll('.trip-chip').forEach((chip) => {
