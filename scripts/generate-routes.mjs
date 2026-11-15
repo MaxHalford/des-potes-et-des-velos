@@ -3,6 +3,13 @@ import { trips } from '../src/data/trips.ts';
 
 const ROUTER = 'https://valhalla1.openstreetmap.de';
 const outDir = new URL('../public/routes/', import.meta.url);
+const routeOverrides = {
+  brittany: {
+    Vannes: [
+      { coordinates: [-3.1197, 47.4833], mode: 'ferry' },
+    ],
+  },
+};
 
 function decodePolyline(encoded, precision = 6) {
   const coordinates = [];
@@ -53,31 +60,25 @@ async function createRoute(trip) {
   for (let index = 0; index < locations.length - 1; index++) {
     const isFerry = trip.stops[index].kind === 'ferry' && trip.stops[index + 1].kind === 'ferry';
     if (isFerry) {
-      const start = locations[index];
-      const end = locations[index + 1];
-      const steps = 40;
-      for (let step = index ? 1 : 0; step <= steps; step++) {
-        points.push({
-          lon: start.lon + (end.lon - start.lon) * step / steps,
-          lat: start.lat + (end.lat - start.lat) * step / steps,
-          ele: 0,
-        });
-      }
+      appendStraightLine(points, locations[index], locations[index + 1]);
       continue;
     }
-    const routeVia = trip.routeVia?.[trip.stops[index + 1].name] ?? [];
+    const routeVia = routeOverrides[trip.id]?.[trip.stops[index + 1].name] ?? [];
     const routeLocations = [
-      locations[index],
-      ...routeVia.map(([lon, lat]) => ({ lon, lat, type: 'break' })),
-      locations[index + 1],
+      { ...locations[index], mode: 'ride' },
+      ...routeVia.map(({ coordinates: [lon, lat], mode }) => ({ lon, lat, type: 'break', mode })),
+      { ...locations[index + 1], mode: 'ride' },
     ];
-    const useFerry = trip.stops[index].kind === 'ferry' || trip.stops[index + 1].kind === 'ferry';
 
     for (let routeIndex = 0; routeIndex < routeLocations.length - 1; routeIndex++) {
+      if (routeLocations[routeIndex + 1].mode === 'ferry') {
+        appendStraightLine(points, routeLocations[routeIndex], routeLocations[routeIndex + 1]);
+        continue;
+      }
       const routed = await post('/route', {
         locations: [routeLocations[routeIndex], routeLocations[routeIndex + 1]],
         costing: 'bicycle',
-        costing_options: { bicycle: { use_ferry: useFerry ? 1 : 0 } },
+        costing_options: { bicycle: { use_ferry: 0 } },
         directions_options: { units: 'kilometers' },
       });
       const profile = await post('/height', {
@@ -96,6 +97,17 @@ async function createRoute(trip) {
     }
   }
   return { points };
+}
+
+function appendStraightLine(points, start, end) {
+  const steps = 40;
+  for (let step = points.length ? 1 : 0; step <= steps; step++) {
+    points.push({
+      lon: start.lon + (end.lon - start.lon) * step / steps,
+      lat: start.lat + (end.lat - start.lat) * step / steps,
+      ele: 0,
+    });
+  }
 }
 
 function toGpx(trip, points) {
