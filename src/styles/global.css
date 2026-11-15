@@ -3,18 +3,16 @@
   --paper: #f7f3e9;
   --paper-deep: #ebe5d7;
   --line: rgba(23, 34, 29, 0.14);
-  --sans: 'Manrope', sans-serif;
-  --serif: 'Newsreader', serif;
-  --mono: 'DM Mono', monospace;
+  --font: 'Manrope', sans-serif;
 }
 
 * { box-sizing: border-box; }
 html, body, main { width: 100%; height: 100%; margin: 0; overflow: hidden; }
-body { color: var(--ink); background: #d9ded8; font-family: var(--sans); }
+body { color: var(--ink); background: #d9ded8; font-family: var(--font); }
 button, a { font: inherit; }
 button { color: inherit; }
 #map { position: absolute; inset: 0; }
-.leaflet-container { font-family: var(--sans); background: #dfe4de; }
+.leaflet-container { font-family: var(--font); background: #dfe4de; }
 .leaflet-bottom.leaflet-left { bottom: 22px; left: 22px; }
 .leaflet-control-zoom {
   border: 1px solid var(--line) !important;
@@ -29,7 +27,7 @@ button { color: inherit; }
 }
 .leaflet-control-attribution {
   max-width: calc(100vw - 120px);
-  font-family: var(--mono);
+  font-family: var(--font);
   font-size: 8px;
   background: rgba(247, 243, 233, .84) !important;
 }
@@ -39,7 +37,7 @@ button { color: inherit; }
   background: var(--ink);
   color: var(--paper);
   box-shadow: 0 5px 18px rgba(23, 34, 29, .2);
-  font: 500 10px/1 var(--sans);
+  font: 500 10px/1 var(--font);
   padding: 7px 9px;
 }
 .leaflet-tooltip-top::before { border-top-color: var(--ink); }
@@ -65,7 +63,7 @@ button { color: inherit; }
   box-shadow: 0 10px 35px rgba(24, 35, 30, .14);
   cursor: pointer;
 }
-.brand strong { display: block; font: 600 18px/1 var(--serif); }
+.brand strong { display: block; font: 600 18px/1 var(--font); }
 
 .basemap-switcher {
   pointer-events: auto;
@@ -82,7 +80,7 @@ button { color: inherit; }
 .basemap-switcher > span {
   padding: 0 7px;
   color: #68736c;
-  font: 500 8px/1 var(--mono);
+  font: 500 8px/1 var(--font);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -92,7 +90,7 @@ button { color: inherit; }
   background: transparent;
   padding: 8px 10px;
   cursor: pointer;
-  font: 600 10px/1 var(--sans);
+  font: 600 10px/1 var(--font);
   transition: background .2s, color .2s;
 }
 .basemap-switcher button:hover { background: var(--paper-deep); }
@@ -130,13 +128,13 @@ button { color: inherit; }
   border-color: var(--ink);
   transform: translateX(8px);
 }
-.trip-index { color: var(--trip-color); font: 500 10px/1 var(--mono); }
+.trip-index { color: var(--trip-color); font: 500 10px/1 var(--font); }
 .trip-chip strong { display: block; font-size: 11px; line-height: 1.2; }
 .trip-chip small {
   display: block;
   margin-top: 3px;
   opacity: .57;
-  font: 400 9px/1 var(--mono);
+  font: 400 9px/1 var(--font);
 }
 
 .map-node-wrapper { background: none; border: 0; }
@@ -159,7 +157,7 @@ button { color: inherit; }
   box-shadow: 0 0 0 4px rgba(255, 255, 255, .9), 0 5px 18px rgba(24, 35, 30, .32);
 }
 .map-node.is-muted { opacity: .24; }
-.map-node > span { display: block; text-align: center; font: 500 7px/23px var(--mono); }
+.map-node > span { display: block; text-align: center; font: 500 7px/23px var(--font); }
 .map-node.is-ferry { background: white; color: var(--trip-color); border-color: var(--trip-color); }
 
 .drawer {
@@ -210,14 +208,14 @@ button { color: inherit; }
 .eyebrow,
 .section-label {
   color: var(--trip-color);
-  font: 500 10px/1.3 var(--mono);
+  font: 500 10px/1.3 var(--font);
   letter-spacing: .1em;
   text-transform: uppercase;
 }
 .drawer h1 {
   max-width: 340px;
   margin: 13px 0 30px;
-  font: 600 clamp(38px, 5vw, 55px)/.94 var(--serif);
+  font: 600 clamp(38px, 5vw, 55px)/.94 var(--font);
   letter-spacing: -.035em;
 }
 .stats {
@@ -231,17 +229,17 @@ button { color: inherit; }
 .stats div + div { border-left: 1px solid var(--line); padding-left: 16px; }
 .stats strong,
 .stats span { display: block; }
-.stats strong { font: 600 18px/1 var(--serif); }
+.stats strong { font: 600 18px/1 var(--font); }
 .stats span {
   margin-top: 5px;
   color: #737c76;
-  font: 500 8px/1.2 var(--mono);
+  font: 500 8px/1.2 var(--font);
   letter-spacing: .07em;
   text-transform: uppercase;
 }
 .elevation-wrap { margin-bottom: 30px; }
 .elevation { display: block; width: 100%; height: 98px; margin-top: 10px; overflow: visible; }
-.elevation text { fill: #768078; font: 8px var(--mono); }
+.elevation text { fill: #768078; font: 8px var(--font); }
 .stop-list {
   position: relative;
   list-style: none;
@@ -282,7 +280,7 @@ button { color: inherit; }
   border-radius: 50%;
   background: var(--paper);
   text-align: center;
-  font: 500 8px/25px var(--mono);
+  font: 500 8px/25px var(--font);
   transition: background .2s, color .2s;
 }
 .stop-list li:hover button > span,
@@ -319,7 +317,7 @@ button { color: inherit; }
 .download small {
   margin-top: 3px;
   opacity: .62;
-  font: 400 8px/1 var(--mono);
+  font: 400 8px/1 var(--font);
   text-transform: uppercase;
   letter-spacing: .06em;
 }
