@@ -9,7 +9,6 @@ import { pathToFileURL } from 'node:url';
 
 const enrichedTrips = await Promise.all(trips.map(async (trip) => {
   const track = await parseGpx(pathToFileURL(resolve(`public/routes/${trip.id}.gpx`)));
-  const { routeVia: _routeVia, ...publicTrip } = trip;
   const stopIndexes: number[] = [];
 
   trip.stops.forEach((stop) => {
@@ -24,6 +23,7 @@ const enrichedTrips = await Promise.all(trips.map(async (trip) => {
         nearest = index;
         nearestDistance = distance;
       }
+      if (distance < 1e-6) break;
     }
     stopIndexes.push(nearest);
   });
@@ -61,7 +61,7 @@ const enrichedTrips = await Promise.all(trips.map(async (trip) => {
   });
 
   return {
-    ...publicTrip,
+    ...trip,
     stats: {
       distanceKm: Math.round(track.distanceKm),
       ascentM: Math.round(track.ascentM / 10) * 10,

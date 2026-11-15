@@ -11,7 +11,6 @@ export type Trip = {
   year: number;
   dates: string;
   color: string;
-  routeVia?: Record<string, [number, number][]>;
   stops: Stop[];
 };
 
@@ -23,10 +22,6 @@ export const trips: Trip[] = [
     year: 2021,
     dates: 'Summer 2021',
     color: '#e85d3f',
-    routeVia: {
-      Morlaix: [[-3.567, 48.276]],
-      Pontchâteau: [[-2.754, 48.177], [-1.6778, 48.1173]],
-    },
     stops: [
       { name: 'Avranches', coordinates: [-1.3569, 48.6844], kind: 'milestone' },
       { name: 'Saint-Malo', coordinates: [-2.0257, 48.6493], kind: 'overnight' },
@@ -36,7 +31,6 @@ export const trips: Trip[] = [
       { name: 'Quiberon', coordinates: [-3.1197, 47.4833], kind: 'ferry' },
       { name: 'Le Palais, Belle-Île-en-Mer', coordinates: [-3.154, 47.346], kind: 'ferry' },
       { name: 'Vannes', coordinates: [-2.7608, 47.6582], kind: 'overnight' },
-      { name: 'Morlaix', coordinates: [-3.8277, 48.5775], kind: 'overnight' },
       { name: 'Pontchâteau', coordinates: [-2.0873, 47.4379], kind: 'overnight' },
       { name: 'Nantes', coordinates: [-1.5536, 47.2184], kind: 'milestone' },
     ],
